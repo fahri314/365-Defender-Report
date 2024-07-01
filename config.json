@@ -1,0 +1,21 @@
+{
+    "report_day": "Friday",
+    "tenant_ids": [
+        {
+            "alias": "Tenant1",
+            "tenant_id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+        },
+        {
+            "alias": "Tenant2",
+            "tenant_id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+        },
+        {
+            "alias": "Tenant2",
+            "tenant_id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+        }
+    ],
+    "exclude_mail_tps": false,
+    "exclude_tps_by_keywords": [
+        "Keyword1", "Keyword2"
+    ]
+}
