@@ -16,7 +16,14 @@ It automatically calculates the last one-week date range based on the day the re
 
 ## Config File
 
-Before running the script, you must modify the values in the config file. 
+Before running the script, you must modify the values in the config file.
+
+- Uses the entered report day in automatic date calculation.
+- Supports multiple tenants and offers options at startup.
+- Exclusion of e-mail alerts.
+- It can exclude from the incident title according to the given keyword list.
+
+Scauth and xsrf_token values ​​are automatically calculated from the entered cookie value.
 
 ## Get Cookie from Defender 365
 
