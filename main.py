@@ -254,8 +254,16 @@ class report:
                 return item.get("newValue")
         return None
 
+    def get_tp_incident_count(self, incidents):
+        count = 0
+        for incident in incidents:
+            if incident.get("Classification") != 20:
+                continue  # Skip incidents that are not TP IDs
+            count += 1
+        return count
+
     def print_tp_severity_dist(self, incidents):
-        grouped_severities = self.group_severities_by_classification(incidents, 10)
+        grouped_severities = self.group_severities_by_classification(incidents, 20)
         print(f"\n\x1b[1;31;43m[+] TP Severity Distribution\x1b[0;0m\n")
         for severity, incidents in grouped_severities.items():
             print(f"{severities[severity]}\t{len(incidents)}")
@@ -267,10 +275,12 @@ class report:
             print(f"{category}\t{len(incidents)}")
 
     def print_device_os_dist(self, devices):
+        total_device_count = len(devices)
         grouped_device_oses = self.group_device_oses(devices)
         print(f"\n\x1b[1;31;43m[+] Device OS Distribution\x1b[0;0m\n")
         for os_name, devices in grouped_device_oses.items():
             print(f"{os_name}\t{len(devices)}")
+        print(f"Grand Total\t{total_device_count}")
 
     def print_tp_incidents_and_comments(self, incidents):
         print(f"\n\x1b[1;31;43m[+] TP Incidents Table\x1b[0;0m\n")
@@ -278,12 +288,12 @@ class report:
 
         for incident in incidents:
             classification = incident.get("Classification")
-            if classification != 10:
+            if classification != 20:
                 continue  # Skip incidents that are not TP IDs
-            
+
             incident_source = incident.get("ProductNames")[0]
             incident_name = incident.get("Title")
-            
+
             # Exclude conditions
             if self.exclude_mail_tps:
                 if incident_source in ["Microsoft Defender XDR", "Microsoft Defender for Office 365"]:
@@ -298,14 +308,14 @@ class report:
             severity = severities.get(incident.get("Severity"), "Unknown")
             impacted_entities = self.detect_impacted_entities(incident)
             incident_id = incident.get("IncidentId")
-            
+
             # Format last activity time
             last_activity = last_activity.split('.')[0]
             formatted_time = datetime.strptime(last_activity, "%Y-%m-%dT%H:%M:%S").strftime("%d-%m-%Y - %H:%M")
-            
+
             # Print TP incident details
-            print(f"{incident_id}\t{formatted_time}\t{incident_name}\t{severity}\tTrue Positive\t{impacted_entities}")
-            
+            print(f"• {incident_id}\t{formatted_time}\t{incident_name}\t{severity}\tTrue Positive\t{impacted_entities}")
+
             tp_incident_id_list.append(incident_id)
 
         print(f"\n\x1b[1;31;43m[+] TP Incidents Analyst Feedback Comments\x1b[0;0m\n")
@@ -407,11 +417,13 @@ if __name__ == '__main__':
     print("\n\x1b[1;31;43m[+] Report date range\x1b[0;0m\n")
     from_date = datetime.strptime(report.from_date, "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%d.%m.%y")
     to_date = datetime.strptime(report.to_date, "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%d.%m.%y")
-    print(from_date, "<->", to_date)
+    print(from_date, "–", to_date)
 
     # Total Incident
+    tp_incident_count = report.get_tp_incident_count(incidents)
+    total_incident = len(incidents)
     print(f"\n\x1b[1;31;43m[+] Total Incident\x1b[0;0m\n")
-    print(len(incidents))
+    print(f"Total: {total_incident} - TP: {tp_incident_count}")
     
     # TP Severity Distribution
     report.print_tp_severity_dist(incidents)
@@ -420,8 +432,9 @@ if __name__ == '__main__':
     report.print_incidents_category_dist(incidents)
     
     # Total number of devices
+    total_device_count = len(devices)
     print(f"\n\x1b[1;31;43m[+] Total Device\x1b[0;0m\n")
-    print(len(devices))
+    print(total_device_count)
     
     # OS Distribution
     report.print_device_os_dist(devices)
