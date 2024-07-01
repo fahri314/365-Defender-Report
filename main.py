@@ -148,7 +148,8 @@ class report:
         # This method is working like 'Export' download button. Max tested page size is 200
         while True:
             page_index += 1
-            uri = f"https://security.microsoft.com/apiproxy/mtp/k8s/machines?lookingBackIndays=7&pageIndex={page_index}&pageSize=200"
+            uri = f"https://security.microsoft.com/apiproxy/mtp/k8s/machines?deviceCategories=Endpoint&onBoardingStatuses=Onboarded&lookingBackIndays=7&pageIndex={page_index}&pageSize=200"
+            
             print("page_index: ", page_index)
             response = requests.get(uri, headers = headers, cookies = cookies)
             if response.text == '[]':
@@ -314,7 +315,7 @@ class report:
             formatted_time = datetime.strptime(last_activity, "%Y-%m-%dT%H:%M:%S").strftime("%d-%m-%Y - %H:%M")
 
             # Print TP incident details
-            print(f"• {incident_id}\t{formatted_time}\t{incident_name}\t{severity}\tTrue Positive\t{impacted_entities}")
+            print(f"{incident_id}\t{formatted_time}\t{incident_name}\t{severity}\tTrue Positive\t{impacted_entities}")
 
             tp_incident_id_list.append(incident_id)
 
@@ -322,7 +323,7 @@ class report:
         # Print Analyst Feedback Comments
         for incident_id in tp_incident_id_list:
             analyst_comment = self.get_analyst_comment(incident_id)
-            print(f"({incident_id}) {analyst_comment}")
+            print(f"• ({incident_id}) {analyst_comment}")
 
     def print_incident_source_dist(self, incidents):
         grouped_incident_sources = self.group_incident_sources(incidents)

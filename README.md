@@ -31,7 +31,7 @@ You can obtain this cookie data from the network section of your browser while l
 
 <https://security.microsoft.com/incidents?tid=your_tenant_id>
 
-## Limitations
+## Request Limitations
 
 - Maximum page size is:
   - incident: 100
