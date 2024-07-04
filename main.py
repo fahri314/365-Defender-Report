@@ -190,6 +190,8 @@ class report:
         # Group devices os
         for device in devices:
             os = device.get("OsPlatform", "Unspecified")
+            if os == "None":
+                continue
             os_groups[os].append(device)
         
         return os_groups
@@ -207,7 +209,8 @@ class report:
         # Group incident sources
         for incident in incidents:
             source = incident.get("ProductNames", "Unspecified")[0]
-            source = incident_source_short_names[source]
+            if source in incident_source_short_names:
+                source = incident_source_short_names[source]
             incident_source_groups[source].append(incident)
         
         return incident_source_groups
@@ -411,8 +414,8 @@ if __name__ == '__main__':
     clear_screen()
     incidents = report.get_incidents()
     devices = report.get_devices()
-    
-    print("==================================================")
+
+    clear_screen()
 
     # Report Date Range
     print("\n\x1b[1;31;43m[+] Report date range\x1b[0;0m\n")
