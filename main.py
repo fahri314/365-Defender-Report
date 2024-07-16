@@ -121,7 +121,7 @@ class report:
     def get_incidents(self):
         incidents = []
         page_index = 0
-        uri = 'https://security.microsoft.com/apiproxy/mtp/incidentQueue/incidents/alerts'
+        uri = f"https://security.microsoft.com/apiproxy/mtp/incidentQueue/incidents/alerts?tid={self.tenant_id}"
         headers = {"x-xsrf-token": self.xsrf_token}
         cookies = {"sccauth": self.sccauth}
         print("[+] Incidents Downloading...")
@@ -135,6 +135,7 @@ class report:
                 break
             incidents.extend(json.loads(response.text))
             if response.status_code != 200:
+                print("Response: ", response.text)
                 raise Exception("Unable to get incidents from tenant, did the session time out?")
 
         return incidents
@@ -148,7 +149,7 @@ class report:
         # This method is working like 'Export' download button. Max tested page size is 200
         while True:
             page_index += 1
-            uri = f"https://security.microsoft.com/apiproxy/mtp/k8s/machines?deviceCategories=Endpoint&onBoardingStatuses=Onboarded&lookingBackIndays=7&pageIndex={page_index}&pageSize=200"
+            uri = f"https://security.microsoft.com/apiproxy/mtp/k8s/machines??tid={self.tenant_id}&deviceCategories=Endpoint&onBoardingStatuses=Onboarded&lookingBackIndays=7&pageIndex={page_index}&pageSize=200"
             
             print("page_index: ", page_index)
             response = requests.get(uri, headers = headers, cookies = cookies)
@@ -156,6 +157,7 @@ class report:
                 break
             devices.extend(json.loads(response.text))
             if response.status_code != 200:
+                print("Response: ", response.text)
                 raise Exception("Unable to get devices from tenant, did the session time out?")
 
         return devices
@@ -247,9 +249,10 @@ class report:
         headers = {"x-xsrf-token": self.xsrf_token}
         cookies = {"sccauth": self.sccauth}
 
-        uri = f"https://security.microsoft.com/apiproxy/mtp/auditHistory/AuditHistory?entityType=IncidentEntity&id={incident_id}&auditType=0&pageIndex=1&pageSize=100"
+        uri = f"https://security.microsoft.com/apiproxy/mtp/auditHistory/AuditHistory?tid={self.tenant_id}&entityType=IncidentEntity&id={incident_id}&auditType=0&pageIndex=1&pageSize=100"
         response = requests.get(uri, headers = headers, cookies = cookies)
         if response.status_code != 200:
+            print("Response: ", response.text)
             raise Exception("Unable to get the audit history from tenant, did the session time out?")
 
         data = response.json()

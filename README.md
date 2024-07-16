@@ -31,6 +31,12 @@ You can obtain this cookie data from the network section of your browser while l
 
 <https://security.microsoft.com/incidents?tid=your_tenant_id>
 
+## Dependencies
+
+```bash
+python3 -m pip install requests
+```
+
 ## Request Limitations
 
 - Maximum page size is:
