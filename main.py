@@ -121,7 +121,7 @@ class report:
     def get_incidents(self):
         incidents = []
         page_index = 0
-        uri = f"https://security.microsoft.com/apiproxy/mtp/incidentQueue/incidents/alerts?tid={self.tenant_id}"
+        uri = f"https://security.microsoft.com/apiproxy/mtp/incidentQueue/incidents/alerts"
         headers = {"x-xsrf-token": self.xsrf_token}
         cookies = {"sccauth": self.sccauth}
         print("[+] Incidents Downloading...")
@@ -133,10 +133,10 @@ class report:
             response = requests.post(uri, json = post_data, headers = headers, cookies = cookies)
             if response.text == '[]':
                 break
-            incidents.extend(json.loads(response.text))
             if response.status_code != 200:
                 print("Response: ", response.text)
                 raise Exception("Unable to get incidents from tenant, did the session time out?")
+            incidents.extend(json.loads(response.text))
 
         return incidents
 
@@ -249,7 +249,7 @@ class report:
         headers = {"x-xsrf-token": self.xsrf_token}
         cookies = {"sccauth": self.sccauth}
 
-        uri = f"https://security.microsoft.com/apiproxy/mtp/auditHistory/AuditHistory?tid={self.tenant_id}&entityType=IncidentEntity&id={incident_id}&auditType=0&pageIndex=1&pageSize=100"
+        uri = f"https://security.microsoft.com/apiproxy/mtp/auditHistory/AuditHistory?&entityType=IncidentEntity&id={incident_id}&auditType=0&pageIndex=1&pageSize=100"
         response = requests.get(uri, headers = headers, cookies = cookies)
         if response.status_code != 200:
             print("Response: ", response.text)
