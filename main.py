@@ -24,10 +24,13 @@ class report:
         # Cookie
         cookie = input("Enter your cookie value: ")
         clear_screen()
-        cookie_keys_to_extract = ['sccauth', 'XSRF-TOKEN']
+        cookie_keys_to_extract = ['sccauth', 'XSRF-TOKEN', 'ai_session', 's.SessID', 'SSR']
         cookie_values = self.extract_values_from_cookie(cookie, cookie_keys_to_extract)
         self.sccauth = cookie_values['sccauth']
         self.xsrf_token = cookie_values['XSRF-TOKEN'].replace('%3A', ":")
+        self.ai_session = cookie_values['ai_session']
+        self.sess_id = cookie_values['s.SessID']
+        self.ssr = cookie_values['SSR']
         # Report date range
         self.from_date, self.to_date = self.get_report_date_range()
         self.edit_list = []
@@ -121,9 +124,8 @@ class report:
     def get_incidents(self):
         incidents = []
         page_index = 0
-        uri = f"https://security.microsoft.com/apiproxy/mtp/incidentQueue/incidents/alerts"
-        headers = {"x-xsrf-token": self.xsrf_token}
-        cookies = {"sccauth": self.sccauth}
+        uri = "https://security.microsoft.com/apiproxy/mtp/incidentQueue/incidents/alerts"
+        headers, cookies = self.generate_header_data()
         print("[+] Incidents Downloading...")
         # This method is working like 'Export' download button. Max page size is 50
         while True:
@@ -143,13 +145,12 @@ class report:
     def get_devices(self):
         devices = []
         page_index = 0
-        headers = {"x-xsrf-token": self.xsrf_token}
-        cookies = {"sccauth": self.sccauth}
+        headers, cookies = self.generate_header_data()
         print("[+] Devices Downloading...")
         # This method is working like 'Export' download button. Max tested page size is 200
         while True:
             page_index += 1
-            uri = f"https://security.microsoft.com/apiproxy/mtp/k8s/machines??tid={self.tenant_id}&deviceCategories=Endpoint&onBoardingStatuses=Onboarded&lookingBackIndays=7&pageIndex={page_index}&pageSize=200"
+            uri = f"https://security.microsoft.com/apiproxy/mtp/k8s/machines?tid={self.tenant_id}&deviceCategories=Endpoint&onBoardingStatuses=Onboarded&lookingBackIndays=7&pageIndex={page_index}&pageSize=200"
             
             print("page_index: ", page_index)
             response = requests.get(uri, headers = headers, cookies = cookies)
@@ -246,9 +247,7 @@ class report:
         return ""
     
     def get_analyst_comment(self, incident_id):
-        headers = {"x-xsrf-token": self.xsrf_token}
-        cookies = {"sccauth": self.sccauth}
-
+        headers, cookies = self.generate_header_data()
         uri = f"https://security.microsoft.com/apiproxy/mtp/auditHistory/AuditHistory?&entityType=IncidentEntity&id={incident_id}&auditType=0&pageIndex=1&pageSize=100"
         response = requests.get(uri, headers = headers, cookies = cookies)
         if response.status_code != 200:
@@ -336,6 +335,56 @@ class report:
         print(f"\n\x1b[1;31;43m[+] Incident Sources Distribution\x1b[0;0m\n")
         for source, incidents in grouped_incident_sources.items():
             print(f"{source}\t{len(incidents)}")
+
+    def generate_header_data(self):
+        headers = {
+            "authority": "security.microsoft.com",
+            "method": "POST",
+            "path": f"/apiproxy/mtp/huntingService/rules?tenantIds[]={self.tenant_id}",
+            "scheme": "https",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "accept-language": "tr-tr",
+            "m-connection": "4g",
+            "m-viewid": "",
+            "origin": "https://security.microsoft.com",
+            "priority": "u=1, i",
+            "referer": "https://security.microsoft.com/v2/advanced-hunting?tid={self.tenant_id}",
+            "request-context": "appId=cid-v1:24b64180-172a-4f78-a057-708a336e0df1",
+            "sec-ch-ua": '"Not)A;Brand";v="99", "Google Chrome";v="127", "Chromium";v="127"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"',
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+            "tenant-id": self.tenant_id,
+            "x-accepted-statuscode": "3..|4..|50.",
+            "x-clientpage": "hunting-2@wicd-hunting",
+            "x-clientpkgversion": "20240722.2",
+            "x-tabvisible": "visible",
+            "x-tid": self.tenant_id,
+            "x-xsrf-token": self.xsrf_token
+        }
+
+        cookies = {
+            "SSR": self.ssr,
+            "at_check": "true",
+            "MicrosoftApplicationsTelemetryDeviceId": "4f63de40-5aac-4464-ac33-aefd31b2191c",
+            "BCP": "AD=1&AL=1&SM=1",
+            "SRCHHPGUSR": "SRCHLANG=tr&DM=1&PV=15.0.0&CIBV=1.1418.9-suno",
+            "i18next": "tr-TR",
+            "MC1": "GUID=9f2c575aba2542fa9d2f6f2170a0e2b2&HASH=9f2c&LV=202304&V=4&LU=1681297818209",
+            "ai_user": "pMdh/yAkjRkRv4v74aHrnL|2024-04-15T11:56:59.714Z",
+            "fptctx2": f"taBcrIH61PuCVH7eNCyH0K%252fD9DJ44Cptuv0RyrXgXCsNTZCNbZUK%252fByrWS2POIr7FFheKPKswtRMpnTtHeWhYS6qjR0gQ%252bn14TiqfRC2uFNpxPnPumLuN75uvN08Vbw8mt4fq5CES7P9LFCNZlZyYMGhiCQ65inxnJZkqzDtVEm9ZlnhtzjZu1YehK5XVNh%252fezivVKF%252b8BVicig3ko8abGPr%252bFqoCs7CM1zT9v8rbqVXfQTeb6yz190pTCXGecPwrQUSkdqRrxBP8LTrpVrwiA1KBhauxYU%252feTFtQgw%252bZHlSAQc89cUDTCODe4ryqqpQR6MOWY3DyooES3W1StM9Ce5goEOqf5lTPpoI18wqZAs%253d",
+            "s.SessID": self.sess_id,
+            "s.Flight": "",
+            "sccauth": self.sccauth,
+            "X-PortalEndpoint-RouteKey": "neuprod_northeurope",
+            "XSRF-TOKEN": self.xsrf_token,
+            "ai_session": self.ai_session
+        }
+        
+        return headers, cookies
 
     def generate_post_data(self, page_index):
         return {
