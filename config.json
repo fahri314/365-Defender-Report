@@ -3,18 +3,22 @@
     "tenant_ids": [
         {
             "alias": "Tenant1",
-            "tenant_id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+            "tenant_id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+            "cookie": ""
         },
         {
             "alias": "Tenant2",
-            "tenant_id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+            "tenant_id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+            "cookie": ""
         },
         {
             "alias": "Tenant3",
-            "tenant_id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+            "tenant_id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+            "cookie": ""
         }
     ],
     "exclude_mail_tps": false,
+    "exclude_benign_positive_alarms": false,
     "exclude_tps_by_keywords": [
         "Keyword1", "Keyword2"
     ]

@@ -21,13 +21,14 @@ Before running the script, you must modify the values in the config file.
 - Uses the entered report day in automatic date calculation.
 - Supports multiple tenants and offers options at startup.
 - Exclusion of e-mail alerts.
-- It can exclude from the incident title according to the given keyword list.
+- Exclusion of Benign Positive alerts.
+- Exclusion of alerts with incident title according to the given keyword list.
 
-Scauth and xsrf_token values ​​are automatically calculated from the entered cookie value.
+'sccauth', 'XSRF-TOKEN', 'ai_session', 's.SessID' and 'SSR' values ​​are automatically calculated from the entered cookie value.
 
 ## Get Cookie from Defender 365
 
-You can obtain this cookie data from the network section of your browser while logged in to the session at the address below. `Scauth` and `xsrf_token` values ​​are automatically calculated from the entered cookie value.
+You can obtain this cookie data from the network section of your browser while logged in to the session at the address below. You can update cookie value at config file.
 
 <https://security.microsoft.com/incidents?tid=your_tenant_id>
 
