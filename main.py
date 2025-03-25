@@ -109,7 +109,7 @@ class report:
         # Get today's date
         today = datetime.today()
         # Ask user if they are within the report date range
-        response = input("Are you within the report date range? (y/n) ")
+        response = input("Are you within the report date range? (y/N): ").strip() or 'n'
         if response.lower() == 'y':
             from_data = self.get_report_start_time(today)
             to_date = self.get_report_end_time(today)
